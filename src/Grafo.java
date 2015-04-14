@@ -47,8 +47,10 @@ public class Grafo {
 	 */
 	public ArrayList<Integer> algoritmoVoraz(){
 		ArrayList<Integer> S = new ArrayList<Integer>();//Lista que se va a devolver con la solucion
+		ArrayList<Integer> S_ = new ArrayList<Integer>();
 		float max = 0;//maxima afinidad
 		int aux = 0;//auxiliar para saber en que posición está el maximo
+		
 		for(int i = 0; i < afinidades.size(); i++){//recorrer lista de afinidades para encontrar el maximo
 			if(afinidades.get(i) > max){//si alguno mejora max se cambia
 				max = afinidades.get(i);
@@ -58,7 +60,12 @@ public class Grafo {
 		//se añaden los vertices a la lista
 		S.add(points.get(aux).x);
 		S.add(points.get(aux).y);
-		return null;
+		
+		while(S_ != S){
+			S_ = S;
+			
+		}
+		return S;
 	}
 	
 	/*Metodo para mostrar la información del grafo*/
