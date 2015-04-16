@@ -47,6 +47,8 @@ public class Main {
 	    b.close();
 	    
 	    //grafo.mostrarGrafo();
+	    //System.out.println();
+	    System.out.println(grafo.algoritmoVoraz());
 	}
 
 }

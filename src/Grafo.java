@@ -1,5 +1,7 @@
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  * 
@@ -16,7 +18,6 @@ public class Grafo {
 
 	private int numeroVertices;
 	private ArrayList<Integer> afinidades;
-	private ArrayList<Point> points;
 	private int[][] matrizAfinidades;
 
 	public Grafo(int numeroVertices, ArrayList<Integer> afinidades) {
@@ -26,7 +27,6 @@ public class Grafo {
 		 
 		setNumeroVertices(numeroVertices);
 		setAfinidades(afinidades);
-		setPoints(new ArrayList<Point>());
 		matrizAfinidades = new int[numeroVertices][numeroVertices];
 		for(int i = 0; i < numeroVertices; i++){
 			for(int j = 0; j < numeroVertices; j++){
@@ -37,7 +37,6 @@ public class Grafo {
 		int aux2 = 1;// sirve para mantener el segundo vértice por el que vamos recorriendo
 		int aux3 = aux2; // sirve para recorrer cada afinidad entre los pares de vertices 
 		for (int i = 0; i < afinidades.size(); i++) {//recorremos en numero de afinidades que haya
-			//points.add(new Point(aux1, aux3));//creamos un nuevo punto y lo añadimos al array 
 			matrizAfinidades[aux1][aux3] = afinidades.get(i);
 			matrizAfinidades[aux3][aux1] = afinidades.get(i);
 			if (aux3 + 1 >= numeroVertices) { //si ya se ha recorrido cada afinidad del un vertice, se pasa al otro
@@ -53,40 +52,80 @@ public class Grafo {
 	/*
 	 * Algoritmo voraz
 	 */
-	public ArrayList<Integer> algoritmoVoraz(){
-		ArrayList<Integer> S = new ArrayList<Integer>();//Lista que se va a devolver con la solucion
-		ArrayList<Integer> S_ = new ArrayList<Integer>();
-		float max = 0;//maxima afinidad
-		int aux = 0;//auxiliar para saber en que posición está el maximo
-		
-		for(int i = 0; i < afinidades.size(); i++){//recorrer lista de afinidades para encontrar el maximo
-			if(afinidades.get(i) > max){//si alguno mejora max se cambia
-				max = afinidades.get(i);
-				aux = i;
+	public Hashtable<Integer, Integer> algoritmoVoraz(){
+		Hashtable<Integer, Integer> S = new Hashtable<>();//Lista que se va a devolver con la solucion
+		Hashtable<Integer, Integer> S_ = new Hashtable<>();
+		int max = 0;//maxima afinidad
+		float valorFuncionObjetivo;
+		float valorFuncionObjetivoAux;
+		int valorSumaAfinidades;
+		int valorSumaAfinidadesAux;
+		int numeroInsertarHash;
+		//auxiliares para saber en que posición está el maximo
+		int auxi = 0; 
+		int auxj = 0;
+
+		for(int i = 0; i < numeroVertices; i++){//recorrer lista de afinidades para encontrar el maximo
+			for(int j = 0; j < numeroVertices; j++){
+				if(matrizAfinidades[i][j] > max){//si alguno mejora max se cambia
+					max = matrizAfinidades[i][j];
+					auxi = i;
+					auxj = j;
+				}
 			}
 		}
 		//se añaden los vertices a la lista
-		S.add(points.get(aux).x);
-		S.add(points.get(aux).y);
+		S.put(auxi, auxi);
+		S.put(auxj, auxj);
+		valorSumaAfinidades = max;
+		valorSumaAfinidadesAux = valorSumaAfinidades;
+		valorFuncionObjetivo = valorSumaAfinidades/S.size();
+		valorFuncionObjetivoAux = valorFuncionObjetivo;
+		numeroInsertarHash = auxi;		
 		
-		while(S_ != S){
+		while(S_.size() != S.size()){
 			S_ = S;
-			
-		}
+			Enumeration<Integer> e = S.keys();
+			int clave;
+			max = -999999;
+			while( e.hasMoreElements() ){
+			  clave = e.nextElement();
+			  for(int i = 0 ; i < numeroVertices; i++){
+				  if(S.containsKey(i))
+					  continue;
+				  else{
+					  if(((matrizAfinidades[clave][i] + valorSumaAfinidades)/S.size()) > valorFuncionObjetivoAux){
+						  valorSumaAfinidadesAux = matrizAfinidades[clave][i] + valorSumaAfinidades;
+						  numeroInsertarHash = i;
+						  valorFuncionObjetivoAux = (float)((matrizAfinidades[clave][i] + valorSumaAfinidades)/(S.size()+1));
+						  System.out.println(valorSumaAfinidadesAux);
+					  }
+				  }//END IF ELSE
+			  }//END FOR
+			}//END SECOND WHILE
+			if(S_.containsKey(numeroInsertarHash))
+				continue;
+			else{
+				S_.put(numeroInsertarHash, numeroInsertarHash);
+				valorFuncionObjetivo = valorFuncionObjetivoAux;
+				valorSumaAfinidades = valorSumaAfinidadesAux;
+			}
+		}//END FRIST WHILE
 		return S;
 	}
 	
-	/*Metodo para mostrar la información del grafo*/
+	
+	
+	/*
+	 * Metodo para mostrar la información del grafo
+	 */
 	
 	public void mostrarGrafo () {
-		/*System.out.println("Número de vértices: " + getNumeroVertices());
-		System.out.println("Lista de afinidades: ");
-		for (int i = 0; i < afinidades.size(); i++) {
-			System.out.println(i + " " + afinidades.get(i) + " " + points.get(i));
-		}*/
+		System.out.println("Número de vértices: " + getNumeroVertices());
+		System.out.println("Matriz de afinidades: ");
 		for(int i = 0; i < numeroVertices; i++){
 			for(int j = 0; j < numeroVertices; j++){
-				System.out.print(matrizAfinidades[i][j]);
+				System.out.print(matrizAfinidades[i][j] + " ");
 			}
 			System.out.println();
 		}
@@ -123,20 +162,6 @@ public class Grafo {
 		this.afinidades = afinidades;
 	}
 
-	/**
-	 * @return the points
-	 */
-	public ArrayList<Point> getPoints () {
-		return points;
-	}
-
-	/**
-	 * @param points
-	 *            the points to set
-	 */
-	public void setPoints (ArrayList<Point> points) {
-		this.points = points;
-	}
 	/**
 	 * @return the matrizAfinidades
 	 */
