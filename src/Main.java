@@ -30,7 +30,7 @@ public class Main {
 		/*variables para guardar el contenido del fichero para luego construir el objeto grafo*/
 		int numeroVertices; 
 		String aux;
-		ArrayList<Float> afinidades = new ArrayList<Float>();
+		ArrayList<Integer> afinidades = new ArrayList<Integer>();
 		
 		/*Se necesita para la lectura del fichero*/
 	    FileReader f = new FileReader("src/instancias/4.txt");
@@ -40,13 +40,13 @@ public class Main {
 	    
 	    /*guardamos las afinidades en un array*/
 	    while((aux = b.readLine())!=null) {
-	        afinidades.add(Float.parseFloat(aux));
+	        afinidades.add(Integer.parseInt(aux));
 	    }
 	    /*construimos el objeto grafo de la clase grafo*/
 	    grafo = new Grafo(numeroVertices, afinidades);
 	    b.close();
 	    
-	    grafo.mostrarGrafo();
+	    //grafo.mostrarGrafo();
 	}
 
 }
