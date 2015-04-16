@@ -48,7 +48,7 @@ public class Main {
 	    
 	    //grafo.mostrarGrafo();
 	    //System.out.println();
-	    System.out.println(grafo.algoritmoVoraz());
+	    System.out.println(grafo.algoritmoVoraz().keySet());
 	}
 
 }

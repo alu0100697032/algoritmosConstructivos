@@ -1,7 +1,7 @@
-import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * 
@@ -21,12 +21,10 @@ public class Grafo {
 	private int[][] matrizAfinidades;
 
 	public Grafo(int numeroVertices, ArrayList<Integer> afinidades) {
-		/*
-		 * Inicializar atributos
-		 */
-		 
+		//inicializar atributos
 		setNumeroVertices(numeroVertices);
 		setAfinidades(afinidades);
+		//inicializar matriz
 		matrizAfinidades = new int[numeroVertices][numeroVertices];
 		for(int i = 0; i < numeroVertices; i++){
 			for(int j = 0; j < numeroVertices; j++){
@@ -49,13 +47,17 @@ public class Grafo {
 				aux3++;
 		}
 	}
-	/*
-	 * Algoritmo voraz
-	 */
-	public Hashtable<Integer, Integer> algoritmoVoraz(){
-		Hashtable<Integer, Integer> S = new Hashtable<>();//Lista que se va a devolver con la solucion
-		Hashtable<Integer, Integer> S_ = new Hashtable<>();
-		int max = 0;//maxima afinidad
+	
+	/*************************
+	 **** GREEDY ALGORITHM ***
+	 ************************/
+	
+	public HashMap<Integer, Integer> algoritmoVoraz(){
+		//Hash que contiene los vertices de la lista
+		HashMap<Integer, Integer> S = new HashMap<>(); 
+		HashMap<Integer, Integer> S_ = new HashMap<>(); 
+		//variables usadas para guardar informacion necesaria para almacenar los nodos en el hash
+		int clave;
 		float valorFuncionObjetivo;
 		float valorFuncionObjetivoAux;
 		int valorSumaAfinidades;
@@ -64,49 +66,51 @@ public class Grafo {
 		//auxiliares para saber en que posición está el maximo
 		int auxi = 0; 
 		int auxj = 0;
-
-		for(int i = 0; i < numeroVertices; i++){//recorrer lista de afinidades para encontrar el maximo
+		//maxima afinidad
+		int max = 0;
+		//RECORRER LA MATRIZ DE AFINIDADES PARA ENCONTRAR EL MAXIMO
+		for(int i = 0; i < numeroVertices; i++){
 			for(int j = 0; j < numeroVertices; j++){
-				if(matrizAfinidades[i][j] > max){//si alguno mejora max se cambia
+				if(matrizAfinidades[i][j] > max){
 					max = matrizAfinidades[i][j];
 					auxi = i;
 					auxj = j;
 				}
 			}
 		}
-		//se añaden los vertices a la lista
+		//SE AÑADEN LOS VERTICES AL HASH
 		S.put(auxi, auxi);
 		S.put(auxj, auxj);
 		valorSumaAfinidades = max;
 		valorSumaAfinidadesAux = valorSumaAfinidades;
 		valorFuncionObjetivo = valorSumaAfinidades/S.size();
 		valorFuncionObjetivoAux = valorFuncionObjetivo;
-		numeroInsertarHash = auxi;		
-		
+		numeroInsertarHash = auxi;	
+		//REPETIR HASTA QUE S SEA IGUAL A S_
 		while(S_.size() != S.size()){
-			S_ = S;
-			Enumeration<Integer> e = S.keys();
-			int clave;
-			max = -999999;
-			while( e.hasMoreElements() ){
-			  clave = e.nextElement();
+			S_ = (HashMap<Integer, Integer>) S.clone(); //se iguala los hash
+			Iterator it = S_.entrySet().iterator();
+			//recorremos el hash para ver si las afinidades mejoran el valor objetivo
+			while(it.hasNext()){
+			  Map.Entry e = (Map.Entry)it.next();
+			  clave = (int) e.getKey();
+			  //para cada nodo del hash recorremos las afinidades(aristas)
 			  for(int i = 0 ; i < numeroVertices; i++){
-				  if(S.containsKey(i))
+				  if(S_.containsKey(i)) //si el nodo ya está en el hash, no se duplica
 					  continue;
-				  else{
+				  else{//si no esta en el hash, se comprueba si mejora el valor objetivo, si mejora, se cambia (se trabaja sobre los auxiliares)
 					  if(((matrizAfinidades[clave][i] + valorSumaAfinidades)/S.size()) > valorFuncionObjetivoAux){
 						  valorSumaAfinidadesAux = matrizAfinidades[clave][i] + valorSumaAfinidades;
 						  numeroInsertarHash = i;
 						  valorFuncionObjetivoAux = (float)((matrizAfinidades[clave][i] + valorSumaAfinidades)/(S.size()+1));
-						  System.out.println(valorSumaAfinidadesAux);
 					  }
 				  }//END IF ELSE
 			  }//END FOR
 			}//END SECOND WHILE
-			if(S_.containsKey(numeroInsertarHash))
+			if(S.containsKey(numeroInsertarHash))//si el nodo que se va a insertar ya esta en el hash no se duplica
 				continue;
-			else{
-				S_.put(numeroInsertarHash, numeroInsertarHash);
+			else{//en el caso contrario se mente en el hash
+				S.put(numeroInsertarHash, numeroInsertarHash);
 				valorFuncionObjetivo = valorFuncionObjetivoAux;
 				valorSumaAfinidades = valorSumaAfinidadesAux;
 			}
