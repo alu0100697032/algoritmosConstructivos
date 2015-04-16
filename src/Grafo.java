@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * 
@@ -118,7 +119,99 @@ public class Grafo {
 		return S;
 	}
 	
+	/*****************************
+	 ******* GRASP ALGORITHM *****
+	 *****************************/
 	
+	public HashMap<Integer, Integer> algoritmoGRASP(int lrc){
+		//Hash que contiene los vertices de la lista
+		HashMap<Integer, Integer> S = new HashMap<>(); 
+		HashMap<Integer, Integer> S_ = new HashMap<>(); 
+		HashMap<Integer, Integer> LRC = new HashMap<>(); 
+		//variables usadas para guardar informacion necesaria para almacenar los nodos en el hash
+		int clave;
+		float valorFuncionObjetivo;
+		float valorFuncionObjetivoAux;
+		int valorSumaAfinidades;
+		int valorSumaAfinidadesAux;
+		int numeroInsertarHash;
+		//auxiliares para saber en que posición está el maximo
+		int auxi = 0; 
+		int auxj = 0;
+		//maxima afinidad
+		int max = 0;
+		//RECORRER LA MATRIZ DE AFINIDADES PARA ENCONTRAR EL MAXIMO
+		for(int i = 0; i < numeroVertices; i++){
+			for(int j = 0; j < numeroVertices; j++){
+				if(matrizAfinidades[i][j] > max){
+					max = matrizAfinidades[i][j];
+					auxi = i;
+					auxj = j;
+				}
+			}
+		}
+		//SE AÑADEN LOS VERTICES AL HASH
+		S.put(auxi, max);
+		S.put(auxj, max);
+		valorSumaAfinidades = max;
+		valorSumaAfinidadesAux = valorSumaAfinidades;
+		valorFuncionObjetivo = valorSumaAfinidades/S.size();
+		valorFuncionObjetivoAux = valorFuncionObjetivo;
+		numeroInsertarHash = auxi;	
+		//REPETIR HASTA QUE S SEA IGUAL A S_
+		while(S_.size() != S.size()){
+			S_ = (HashMap<Integer, Integer>) S.clone(); //se iguala los hash
+			LRC.clear();
+			Iterator it = S_.entrySet().iterator();
+			//recorremos el hash para ver si las afinidades mejoran el valor objetivo
+			while(it.hasNext()){
+			  Map.Entry e = (Map.Entry)it.next();
+			  clave = (int) e.getKey();
+			  //para cada nodo del hash recorremos las afinidades(aristas)
+			  for(int i = 0 ; i < numeroVertices; i++){
+				  if(S_.containsKey(i)) //si el nodo ya está en el hash, no se duplica
+					  continue;
+				  else{//si no esta en el hash, se comprueba si mejora el valor objetivo, si mejora, se cambia (se trabaja sobre los auxiliares)
+					  if(((matrizAfinidades[clave][i] + valorSumaAfinidades)/S.size()) > valorFuncionObjetivoAux){
+						  LRC.put(i, valorSumaAfinidadesAux);
+						  valorSumaAfinidadesAux = matrizAfinidades[clave][i] + valorSumaAfinidades;
+						  valorFuncionObjetivoAux = (float)((matrizAfinidades[clave][i] + valorSumaAfinidades)/(S.size()+1));
+					  }
+				  }//END IF ELSE
+			  }//END FOR
+			}//END SECOND WHILE
+			int auxnumber = 0;
+			if(LRC.size() <= lrc){
+				for(int i = 0; i < LRC.size(); i++){
+					if(LRC.containsKey(i)){
+						if(max < LRC.get(i)){
+							max = LRC.get(i);
+							auxnumber = i;
+						}
+					}
+				}
+			}else{
+				max = -99999999;
+				for(int i = 0; i < lrc; i++){
+					Random rnd = new Random();
+					int number = (int)(rnd.nextDouble() * lrc + 1);
+					if(LRC.containsKey(number)){
+						if(max < LRC.get(number)){
+							max = LRC.get(number);
+							auxnumber = number;
+						}
+					}
+				}
+			}
+			if(valorFuncionObjetivo < (max/S.size()+1)){
+				valorFuncionObjetivo = (max/S.size()+1);
+				S.put(auxnumber, auxnumber);
+				valorSumaAfinidades = max;
+				System.out.println(S.size());
+			}
+		}//END FRIST WHILE
+		return S;
+	}
 	
 	/*
 	 * Metodo para mostrar la información del grafo
