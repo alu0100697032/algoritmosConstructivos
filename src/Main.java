@@ -33,7 +33,7 @@ public class Main {
 		ArrayList<Integer> afinidades = new ArrayList<Integer>();
 		
 		/*Se necesita para la lectura del fichero*/
-	    FileReader f = new FileReader("src/instancias/15.txt");
+	    FileReader f = new FileReader("src/instancias/4.txt");
 	    BufferedReader b = new BufferedReader(f);
 	    
 	    numeroVertices = Integer.parseInt(b.readLine());//guardamos el numero de vertices
@@ -46,10 +46,12 @@ public class Main {
 	    grafo = new Grafo(numeroVertices, afinidades);
 	    b.close();
 	    
-	    //grafo.mostrarGrafo();
-	    //System.out.println();
-	    System.out.println(grafo.algoritmoVoraz().keySet());
-	    System.out.println(grafo.algoritmoGRASP(numeroVertices).keySet());
+	    grafo.mostrarGrafo();
+	    System.out.println();
+	    System.out.println(grafo.algoritmoVorazNew().keySet());
+	    
+	    //System.out.println(grafo.algoritmoVoraz().keySet());
+	    //System.out.println(grafo.algoritmoGRASP(numeroVertices).keySet());
 	}
 
 }

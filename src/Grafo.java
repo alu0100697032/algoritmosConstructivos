@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -17,6 +18,7 @@ import java.util.Random;
  */
 public class Grafo {
 
+	static final int MINIMO = -99999999;
 	private int numeroVertices;
 	private ArrayList<Integer> afinidades;
 	private int[][] matrizAfinidades;
@@ -29,7 +31,7 @@ public class Grafo {
 		matrizAfinidades = new int[numeroVertices][numeroVertices];
 		for(int i = 0; i < numeroVertices; i++){
 			for(int j = 0; j < numeroVertices; j++){
-				matrizAfinidades[i][j] = -9999999;
+				matrizAfinidades[i][j] = MINIMO;
 			}
 		}
 		int aux1 = 0;// sirve para mantener el primer vértice por el que vamos recorriendo
@@ -55,8 +57,8 @@ public class Grafo {
 	
 	public HashMap<Integer, Integer> algoritmoVoraz(){
 		//Hash que contiene los vertices de la lista
-		HashMap<Integer, Integer> S = new HashMap<>(); 
-		HashMap<Integer, Integer> S_ = new HashMap<>(); 
+		LinkedHashMap<Integer, Integer> S = new LinkedHashMap<>(); 
+		LinkedHashMap<Integer, Integer> S_ = new LinkedHashMap<>(); 
 		//variables usadas para guardar informacion necesaria para almacenar los nodos en el hash
 		int clave;
 		float valorFuncionObjetivo;
@@ -68,7 +70,7 @@ public class Grafo {
 		int auxi = 0; 
 		int auxj = 0;
 		//maxima afinidad
-		int max = 0;
+		int max = MINIMO;
 		//RECORRER LA MATRIZ DE AFINIDADES PARA ENCONTRAR EL MAXIMO
 		for(int i = 0; i < numeroVertices; i++){
 			for(int j = 0; j < numeroVertices; j++){
@@ -89,7 +91,7 @@ public class Grafo {
 		numeroInsertarHash = auxi;	
 		//REPETIR HASTA QUE S SEA IGUAL A S_
 		while(S_.size() != S.size()){
-			S_ = (HashMap<Integer, Integer>) S.clone(); //se iguala los hash
+			S_ = (LinkedHashMap<Integer, Integer>) S.clone(); //se iguala los hash
 			Iterator it = S_.entrySet().iterator();
 			//recorremos el hash para ver si las afinidades mejoran el valor objetivo
 			while(it.hasNext()){
@@ -116,6 +118,78 @@ public class Grafo {
 				valorSumaAfinidades = valorSumaAfinidadesAux;
 			}
 		}//END FRIST WHILE
+		return S;
+	}
+	
+	/*****************************
+	 **** NEW GREEDY ALGORITHM ***
+	 *****************************/
+	
+	public HashMap<Integer, Integer> algoritmoVorazNew(){
+		//Hash que contiene los vertices de la lista
+		LinkedHashMap<Integer, Integer> S = new LinkedHashMap<>(); 
+		LinkedHashMap<Integer, Integer> S_ = new LinkedHashMap<>();  
+		//variables usadas para guardar informacion necesaria para almacenar los nodos en el hash
+		int clave;
+		float valorFuncionObjetivo;
+		float valorFuncionObjetivoAux;
+		int valorSumaAfinidades = 0;
+		int valorSumaAfinidadesAux;
+		int numeroInsertarHash;
+		//auxiliares para saber en que posición está el maximo
+		int auxi = 0; 
+		int auxj = 0;
+		//maxima afinidad
+		int max = MINIMO;
+		//RECORRER LA MATRIZ DE AFINIDADES PARA ENCONTRAR EL RECORRIDO CON MAYOR VALOR
+		for(int i = 0; i < numeroVertices; i++){
+			max = MINIMO;
+			for(int j = 0; j < numeroVertices; j++){
+				if(matrizAfinidades[i][j] > max){
+					max = matrizAfinidades[i][j];
+					auxi = i;
+					auxj = j;
+				}
+			}
+			S.put(auxi, auxi);
+			S.put(auxj, auxj);
+			System.out.println(max);
+			System.out.println(S.keySet());
+			valorSumaAfinidades = valorSumaAfinidades + max;
+		}
+		valorSumaAfinidadesAux = valorSumaAfinidades;
+		valorFuncionObjetivo = valorSumaAfinidades/S.size();
+		valorFuncionObjetivoAux = valorFuncionObjetivo;
+		System.out.println(valorSumaAfinidades);
+		//REPETIR HASTA QUE S SEA IGUAL A S_
+		/*while(S_.size() != S.size()){
+			S_ = (LinkedHashMap<Integer, Integer>) S.clone(); //se iguala los hash
+			Iterator it = S_.entrySet().iterator();
+			//recorremos el hash para ver si las afinidades mejoran el valor objetivo
+			while(it.hasNext()){
+			  Map.Entry e = (Map.Entry)it.next();
+			  clave = (int) e.getKey();
+			  //para cada nodo del hash recorremos las afinidades(aristas)
+			  for(int i = 0 ; i < numeroVertices; i++){
+				  if(S_.containsKey(i)) //si el nodo ya está en el hash, no se duplica
+					  continue;
+				  else{//si no esta en el hash, se comprueba si mejora el valor objetivo, si mejora, se cambia (se trabaja sobre los auxiliares)
+					  if(((matrizAfinidades[clave][i] + valorSumaAfinidades)/S.size()) > valorFuncionObjetivoAux){
+						  valorSumaAfinidadesAux = matrizAfinidades[clave][i] + valorSumaAfinidades;
+						  numeroInsertarHash = i;
+						  valorFuncionObjetivoAux = (float)((matrizAfinidades[clave][i] + valorSumaAfinidades)/(S.size()+1));
+					  }
+				  }//END IF ELSE
+			  }//END FOR
+			}//END SECOND WHILE
+			if(S.containsKey(numeroInsertarHash))//si el nodo que se va a insertar ya esta en el hash no se duplica
+				continue;
+			else{//en el caso contrario se mente en el hash
+				S.put(numeroInsertarHash, numeroInsertarHash);
+				valorFuncionObjetivo = valorFuncionObjetivoAux;
+				valorSumaAfinidades = valorSumaAfinidadesAux;
+			}
+		}//END FRIST WHILE*/
 		return S;
 	}
 	
